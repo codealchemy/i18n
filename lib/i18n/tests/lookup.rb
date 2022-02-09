@@ -6,7 +6,7 @@ module I18n
       def setup
         super
         I18n.backend.store_translations(:en, :foo => { :bar => 'bar', :baz => 'baz' }, :falsy => false, :truthy => true,
-          :string => "a", :array => %w(a b c), :hash => { "a" => "b" })
+          :string => "a", :array => %w(a b c), :hash => { "a" => "b" }, :'qux.' => 'qux')
       end
 
       test "lookup: it returns a string" do
@@ -29,12 +29,21 @@ module I18n
         assert I18n.t(:falsy) === false
       end
 
+      test "lookup: it returns the value of a key that ends with the separator" do
+        assert_equal("qux", I18n.t('qux.', separator: '.'))
+      end
+
       test "lookup: given a missing key, no default and no raise option it returns an error message" do
         assert_equal "translation missing: en.missing", I18n.t(:missing)
       end
 
       test "lookup: given a missing key, no default and the raise option it raises MissingTranslationData" do
         assert_raises(I18n::MissingTranslationData) { I18n.t(:missing, :raise => true) }
+      end
+
+      test "lookup: given a key that matches the separator, no default and the raise option it raises MissingTranslationData" do
+        assert_raises(I18n::MissingTranslationData) { I18n.t('.', :separator => '.', :raise => true) }
+        assert_raises(I18n::MissingTranslationData) { I18n.t('..', :separator => '.', :raise => true) }
       end
 
       test "lookup: does not raise an exception if no translation data is present for the given locale" do

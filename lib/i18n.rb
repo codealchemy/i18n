@@ -406,7 +406,7 @@ module I18n
         when Array
           key.flat_map { |k| normalize_key(k, separator) }
         else
-          keys = key.to_s.split(separator)
+          keys = key.to_s.split(/(?!(\b|^)#{Regexp.quote(separator)}+$)#{Regexp.quote(separator)}{1}/)
           keys.delete('')
           keys.map! do |k|
             case k
